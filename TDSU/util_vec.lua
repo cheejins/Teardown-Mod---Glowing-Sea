@@ -29,10 +29,15 @@ do
         "  " .. sfn(vec[3], decimals or 2))
     end
 
+    ---Move a point towards another point at a specified speed.
+    ---@param startPos table
+    ---@param endPos table
+    ---@param speed number
     VecApproach = function(startPos, endPos, speed)
         local subtractedPos = VecScale(VecNormalize(VecSub(endPos, startPos)), speed)
         return VecAdd(startPos, subtractedPos)
     end
+
 end
 
 
@@ -40,16 +45,8 @@ end
 do
     function AabbDimensions(min, max) return Vec(max[1] - min[1], max[2] - min[2], max[3] - min[3]) end
     function AabbDraw(v1, v2, r, g, b, a)
-        r = r or 1
-        g = g or 1
-        b = b or 1
-        a = a or 1
-        local x1 = v1[1]
-        local y1 = v1[2]
-        local z1 = v1[3]
-        local x2 = v2[1]
-        local y2 = v2[2]
-        local z2 = v2[3]
+        r = r or 1 g = g or 1 b = b or 1 a = a or 1
+        local x1 = v1[1] local y1 = v1[2] local z1 = v1[3] local x2 = v2[1] local y2 = v2[2] local z2 = v2[3]
         -- x lines top
         DebugLine(Vec(x1,y1,z1), Vec(x2,y1,z1), r, g, b, a)
         DebugLine(Vec(x1,y1,z2), Vec(x2,y1,z2), r, g, b, a)
@@ -176,6 +173,7 @@ do
     end
 end
 
+
 GetCrosshairWorldPos = function(rejectBodies)
 
     local crosshairTr = getCrosshairTr()
@@ -199,4 +197,16 @@ GetCrosshairCameraTr = function(pos, x, y)
 
     return crosshairTr
 
+end
+
+function DebugPath(tb_points, tb_color, a, dots, dots_size)
+    if tb_points >= 2 then
+        for i = 1, #tb_points - 1 do -- Stop at the second last point.
+            dbl(tb_points[i], tb_points[i+1], table.unpack(tb_color), a or 1)
+            if dots then
+                DrawDot(tb_points[1], dots_size or 0.5, dots_size or 0.5, table.unpack(tb_color or Colors.white))
+                DrawDot(tb_points[#tb_points], dots_size or 0.5, dots_size or 0.5, table.unpack(tb_color or Colors.white))
+            end
+        end
+    end
 end

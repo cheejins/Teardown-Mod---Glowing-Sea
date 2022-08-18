@@ -1,17 +1,3 @@
---[[TOOL]]
----Disable all tools except specified ones.
----@param allowTools table -- Table of strings (tool names) to not disable.
-function disableTools(allowTools)
-    local toolNames = {sledge = 'sledge', spraycan = 'spraycan', extinguisher ='extinguisher', blowtorch = 'blowtorch'}
-    local tools = ListKeys("game.tool")
-    for i=1, #tools do
-        if tools[i] ~= toolNames[tools[i]] then
-            SetBool("game.tool."..tools[i]..".enabled", false)
-        end
-    end
-end
-
-
 --[[TIMERS]]
 do
 

@@ -91,8 +91,12 @@ do
             local b = GetShapeBody(s)
             return h, p, s, b, d, n
         elseif not returnNil then
-            return true, TransformToParentPoint(tr, Vec(0,0,-100))
+            return true, TransformToParentPoint(tr, Vec(0,0,-300)) ---@return table A pos 300m infront of the player.
         end
     end
 
 end
+
+
+--[[BOOLEAN]]
+function boolflip(bool) return not bool end

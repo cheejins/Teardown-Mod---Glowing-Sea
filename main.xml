@@ -1,8 +1,11 @@
-<scene version='0.6.0' shadowVolume='200 50 200'>
-    <environment template='sunset'/>
-    <script file='main.lua'/>
-    <script file='sandbox.lua'/>
-    <voxbox pos='-25 0 -25' size='500 1 500'/>
-    <voxbox pos='-1 0.1 -5' size='20 20 2' material='wood' color='0.7 0.5 0.3'/>
-    <spawnpoint pos='0 1 0' rot='0 180 0'/>
+<scene version="1.1.0" shadowVolume="200 50 200">
+	<group name="Scripts">
+		<script file="sandbox.lua"/>
+		<script file="main.lua"/>
+	</group>
+	<group name="Map">
+		<environment template="sunrise"/>
+		<voxbox pos="-25.0 0.0 -25.0" texture="9" size="500 1 500" color="0.5 0.5 0.5"/>
+		<spawnpoint pos="0.0 0.0 0.0" rot="0 0 0"/>
+	</group>
 </scene>
