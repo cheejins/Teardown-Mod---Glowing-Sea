@@ -18,7 +18,10 @@ do
     end
 
     ---Get a random index of a table (not the value).
-    function GetRandomIndex(tb) return tb[math.random(1, #tb)] end
+    function GetRandomIndex(tb)
+        local i = math.random(1, #tb)
+        return i, tb[i]
+    end
 
     ---Get the next index of a table (not the value). Loop to first index if on the last index.
     function GetTableNextIndex(tb, i)

@@ -5,15 +5,14 @@
 	</group>
 	<group name="Map">
 		<environment template="sunrise"/>
-		<body pos="5.0 -0.1 5.0" dynamic="false">
-			<!-- <voxbox pos="-5.0 0.0 -5.0" texture="11" size="100 1 100" color="0.5 0.5 0.5"/> -->
-		</body>
+		<body pos="5.0 -0.1 5.0" dynamic="false"/>
 		<spawnpoint pos="0.0 0.0 0.0" rot="0 0 0"/>
 		<body dynamic="true"/>
 	</group>
 	<group name="Prespawned">
-		<body tags="playerbody" dynamic="true">
-			<voxbox size="10 2 10"/>
+		<body tags="playerbody" pos="-0.5 0.0 -0.5" dynamic="true">
+			<voxbox size="10 2 10" color="0.0 0.0 0.0"/>
 		</body>
 	</group>
 </scene>
+

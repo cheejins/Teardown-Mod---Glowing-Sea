@@ -1,3 +1,6 @@
+ShowCamera = true
+PlayerMode = true
+
 Player = {
 
     camera = {
@@ -26,7 +29,7 @@ Player = {
 function InitPlayer()
 
     Player.body = FindBody('playerbody', true)
-    Player.camera.tr.rot = QuatEuler(-90,0,0)
+    Player.camera.tr.rot = QuatEuler(-90, 0, 0)
 
 end
 
@@ -38,8 +41,10 @@ function TickPlayer()
     DrawBodyOutline(Player.body, 0,1,0.5, 1)
     PointLight(VecAdd(Player.tr.pos, Vec(0, 0.5, 0)), 1,1,1, 0.5)
 
-    PlayerRunCamera()
-    PlayerRunMovement()
+    if PlayerMode then
+        PlayerRunCamera()
+        PlayerRunMovement()
+    end
 
 end
 
@@ -47,7 +52,6 @@ function PlayerRunMovement()
 
     local movement = Player.movement
     local dirs = Player.movement.dirs
-
 
     local moving = false -- Check if player is being moved by movement keys.
     local moveDir = Vec(0,0,0) -- Default movement = no movent.
@@ -92,7 +96,6 @@ function PlayerRunCamera()
     cam.tr.pos[1] = GetBodyTransform(Player.body).pos[1]
     cam.tr.pos[2] = zoom.value
     cam.tr.pos[3] = GetBodyTransform(Player.body).pos[3]
-
 
     SetCameraTransform(Player.camera.tr)
 

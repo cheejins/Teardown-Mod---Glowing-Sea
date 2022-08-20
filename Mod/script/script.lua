@@ -1,30 +1,35 @@
-#include "player/player.lua"
 #include "debug/db.lua"
+#include "player/player.lua"
 #include "procgen/procgen.lua"
+#include "procgen/tiles.lua"
 
 
 RunArgs = {} ---Arguements for main.lua (master script).
-
 tdsu = {} --- Functions
 
 
 function Init()
 
     InitArgs() -- Init the args for the master script.
-    InitUtils() -- Init the utils library.
-
 
     InitPlayer()
     GenerateTiles()
+
 end
 
 function Tick()
-    TickUtils() -- Manage and run the utils library.
 
     TickPlayer()
+    -- GenerateDynamicTiles()
+    UpdateTiles()
+    HighlightPlayerTile(Player, Tiles, TileSize)
 
     if InputPressed("f5") then
         RegenerateTiles()
+    end
+
+    if InputPressed("rmb") then
+        PlayerMode = not PlayerMode
     end
 
 end
@@ -34,7 +39,6 @@ end
 function Draw()
     DrawWorldGrid(Player, 50, 50, TileSize)
 end
-
 
 
 ---Arguements for main.lua (master script).
