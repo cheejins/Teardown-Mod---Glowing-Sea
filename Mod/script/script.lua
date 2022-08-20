@@ -15,18 +15,24 @@ function Init()
 
 
     InitPlayer()
+    GenerateTiles()
 end
 
 function Tick()
     TickUtils() -- Manage and run the utils library.
 
     TickPlayer()
+
+    if InputPressed("f5") then
+        RegenerateTiles()
+    end
+
 end
 
 function Update()
 end
 function Draw()
-    DrawWorldGrid(Player, 50, 50, 10)
+    DrawWorldGrid(Player, 50, 50, TileSize)
 end
 
 

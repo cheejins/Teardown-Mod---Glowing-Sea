@@ -7,7 +7,7 @@ Player = {
     },
 
     movement = {
-        speed = 10,
+        speed = 20,
         dirs = {
             { key ='w', dir = Vec(0,0,-1) },
             { key ='s', dir = Vec(0,0,1)  },
@@ -36,6 +36,7 @@ function TickPlayer()
     Player.tr.pos = AabbGetBodyCenterPos(Player.body)
 
     DrawBodyOutline(Player.body, 0,1,0.5, 1)
+    PointLight(VecAdd(Player.tr.pos, Vec(0, 0.5, 0)), 1,1,1, 0.5)
 
     PlayerRunCamera()
     PlayerRunMovement()
