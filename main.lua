@@ -1,4 +1,4 @@
-#include "Mod/script/_Main.lua"
+#include "Mod/script/script.lua"
 #include "TDSU/tdsu.lua"
 
 
@@ -24,3 +24,6 @@ end
 function draw()
     Draw()
 end
+
+
+UpdateQuickloadPatch() --- umf goodliness
