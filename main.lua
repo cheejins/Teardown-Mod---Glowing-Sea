@@ -10,13 +10,13 @@
 
 function init()
     print("----------------------------------------------------------------")
-    Init()
     InitUtils() -- Init the utils library.
+    Init()
 end
 
 function tick()
-    Tick()
     TickUtils() -- Manage and run the utils library.
+    Tick()
 end
 
 function update()

@@ -4,6 +4,7 @@
 #include "procgen/tiles.lua"
 
 
+isRunning = true
 RunArgs = {} ---Arguements for main.lua (master script).
 tdsu = {} --- Functions
 
@@ -15,21 +16,33 @@ function Init()
     InitPlayer()
     GenerateTiles()
 
+    print('Mod  initialized.')
 end
 
 function Tick()
 
-    TickPlayer()
-    -- GenerateDynamicTiles()
-    UpdateTiles()
-    HighlightPlayerTile(Player, Tiles, TileSize)
-
-    if InputPressed("f5") then
-        RegenerateTiles()
+    if InputPressed("f4") then
+        isRunning = not isRunning
     end
 
-    if InputPressed("rmb") then
-        PlayerMode = not PlayerMode
+    if isRunning then
+
+        TickPlayer()
+        UpdateTiles()
+        ManageDynamicTiles()
+
+        HighlightPlayerTile(Player, Tiles, TileSize)
+
+        if InputPressed("f5") then
+            RegenerateTiles()
+        end
+
+        if InputPressed("rmb") then
+            PlayerMode = not PlayerMode
+        end
+
+        DebugMod()
+
     end
 
 end
@@ -37,7 +50,9 @@ end
 function Update()
 end
 function Draw()
-    DrawWorldGrid(Player, 50, 50, TileSize)
+    if isRunning then
+        DrawWorldGrid(Player, 50, 50, TileSize)
+    end
 end
 
 

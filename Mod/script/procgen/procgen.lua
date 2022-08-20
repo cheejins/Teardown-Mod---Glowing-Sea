@@ -1,13 +1,18 @@
-Grid = { x = 0, y = 0 } -- Root grid used by the entire mod.
-GridDimensions = { x = 25, z = 25 }
-
 Tiles = {}
 TileSize = 5
 
--- Used to find a tile reference by location.
-TileLocations = {}
 
-TileBounds = { x = 0, y = 0 }
+Grid = {
+    corner = { x = 0,  y = 0 }, -- Top left corner of the grid.
+    pos    = { x = 0,  y = 0 }, -- Root grid used by the entire mod.
+    dim    = { x = 25, z = 25 }, -- Draw dimensions of the grid.
+}
+
+TileBounds = { x = 50, z = 50 } -- Allow tiles to exist within these bounds relative to the grid pos
+TileBoundaries = { x = 100, z = 100} -- Delete tiles outside of this range.
+
+
+TileLocations = {} --- Used to find a tile reference by location such as TileLocations[x][z].
 
 
 ---Create a tile object, instantiate and create references for it.
@@ -77,45 +82,52 @@ function DrawWorldGrid(Player, gx, gz, spacing)
     spacing = spacing or 10
     local zoom = Player.camera.zoom.value
 
-    local px = GetTileScalePos(Player.tr.pos[1], TileSize)
-    local pz = GetTileScalePos(Player.tr.pos[3], TileSize)
-
-    dbw('Player.tr.pos[1]', sfn(Player.tr.pos[1]))
-    dbw('Player.tr.pos[3]', sfn(Player.tr.pos[3]))
-    dbw('px', px)
-    dbw('pz', pz)
-    dbw('Grid.x', Grid.x)
-    dbw('Grid.z', Grid.z)
-    dbw('#Tiles', #Tiles)
-
+    local px = RoundToTileSize(Player.tr.pos[1], TileSize)
+    local pz = RoundToTileSize(Player.tr.pos[3], TileSize)
 
     local gxStart = -gx/2 -- Bottom left corner of origin.
     local gzStart = -gz/2
 
-    Grid.x = px + gxStart -- Top left corner of the grid.
-    Grid.z = pz + gzStart -- Top left corner of the grid.
+    Grid.corner.x = px + gxStart -- Top left corner of the grid.
+    Grid.corner.z = pz + gzStart -- Top left corner of the grid.
 
     for x = gxStart, gx/2, spacing do
-        for z = gzStart, gz/2, spacing do
+        for z = gzStart, gz/2 - 1, spacing do
 
             local pos = Vec(x + px, 0, z + pz)
             local ux, uy = UiWorldToPixel(pos)
 
-            UiFont("bold.ttf", 18)
+            UiFont("bold.ttf", (20 * 30/zoom))
             UiAlign("center middle")
             UiColor(0,0,0,1)
-            UiTextOutline(1,1,1, 0.3, 0.3)
+            UiTextOutline(1,1,1, 0.5, 0.2)
 
             UiPush()
 
                 UiTranslate(ux, uy)
-                UiImageBox("ui/common/dot.png", 8,8, 0,0)
+                UiImageBox("ui/common/dot.png", 8 * 30/zoom, 8 * 30/zoom, 0,0)
 
-                UiTranslate(0, 20)
+            UiPop()
+
+            UiPush()
+
+                local pos = Vec(x + px + (spacing/2), 0, z + pz + (spacing/2))
+                local ux, uy = UiWorldToPixel(pos)
+                UiTranslate(ux, uy)
                 local gdx = x + px
                 local gdz = z + pz
-                local coord = '(' .. gdx .. ' , ' .. gdz .. ')'
-                UiText(coord)
+
+                UiAlign("right middle")
+                UiColor(1,0,0,1)
+                UiText(gdx)
+
+                UiAlign("center top")
+                UiColor(0,0,0,1)
+                UiText(",")
+
+                UiAlign("left middle")
+                UiColor(0,0,1,1)
+                UiText(gdz)
 
             UiPop()
 
@@ -124,16 +136,15 @@ function DrawWorldGrid(Player, gx, gz, spacing)
 
 end
 
-
+---Spawn all tiles in the Tiles table.
 function GenerateTiles()
 
-    local gd = GridDimensions
+    local gd = Grid.dim
 
     -- Create tile based on dimensions.
-    for tx = -gd.x, gd.x-1, TileSize do
+    for tx = -gd.x, gd.x, TileSize do
         for tz = -gd.z, gd.z-1, TileSize do
             CreateTile(tx, tz, 10)
-            -- print(tx,tz)
         end
     end
 
@@ -152,7 +163,6 @@ function GenerateTiles()
             tile.color[3] .. '"/>' .. '</body>'
 
         local entities = Spawn(xml, Transform(Vec(0, 0, 0)))
-        -- print(xml)
 
         for index, entity in ipairs(entities) do
             if GetEntityType(entity) == "body" then
@@ -172,44 +182,77 @@ end
 
 function UpdateTiles()
 
+    -- Set grid pos to player pos.
+    Grid.pos = {
+        x = RoundToTileSize(Player.tr.pos[1], TileSize),
+        z = RoundToTileSize(Player.tr.pos[3], TileSize)
+    }
+
+    -- -- Set grid pos to camera pos.
+    -- Grid.pos = {
+    --     x = GetTileScalePos(Player.camera.tr.pos[1], TileSize),
+    --     z = GetTileScalePos(Player.camera.tr.pos[3], TileSize)
+    -- }
+
+
     -- Update tile bounds.
     -- TileBounds.x =
     -- TileBounds.y =
 
-    lastTime = lastTime or 0
+    -- lastTime = lastTime or 0
 
-    rx = rx or math.random(1, 4) * 5 * ternary(math.random() > 0.5, 1, -1)
-    rz = rz or math.random(1, 4) * 5 * ternary(math.random() > 0.5, 1, -1)
+    -- rx = rx or math.random(1, 4) * 5 * ternary(math.random() > 0.5, 1, -1)
+    -- rz = rz or math.random(1, 4) * 5 * ternary(math.random() > 0.5, 1, -1)
 
-    if GetTime() - lastTime >= 1 then
-        lastTime = GetTime()
-        rx = math.random(1, 4) * 5 * ternary(math.random() > 0.5, 1, -1)
-        rz = math.random(1, 4) * 5 * ternary(math.random() > 0.5, 1, -1)
-    end
+    -- if GetTime() - lastTime >= 1 then
+    --     lastTime = GetTime()
+    --     rx = math.random(1, 4) * 5 * ternary(math.random() > 0.5, 1, -1)
+    --     rz = math.random(1, 4) * 5 * ternary(math.random() > 0.5, 1, -1)
+    -- end
 
-    DrawBodyOutline(GetTile(rx, rz).body, 1,1,1, 1)
+    -- local tile = GetTile(rx, rz)
+    -- DrawBodyOutline(tile.body, 1,1,1, 1)
 
 end
 
-function GenerateDynamicTiles()
+function ManageDynamicTiles()
 
     -- Balance between deleting and spawning old and new tiles sequentially. (spread out linear processing to reduce lag spikes).
 
     local valid = false
 
-
     local tilesToDelete = {}
 
-    -- -- Scan for tiles to remove.
-    -- for i = 1, #TileLocations[x] do
-    --     local tile = Tiles[i]
-    -- end
+
+    -- Scan for tiles to remove.
+    for i = 1, #Tiles do
+        local tile = Tiles[i]
+
+        local gpx = Grid.pos.x
+        local gpz = Grid.pos.z
 
 
-    for index, tileToDelete in ipairs(tilesToDelete) do
-        -- DeleteTile(Tiles, tileToDelete)
-        table.remove(Tiles, tileToDelete)
+        -- -- Check and remove tile if outside of boundaries
+        -- for x = Grid.x, TileSize do -- Check x values
+        --     for z = Grid.z, TileSize do -- Check x values
+
+        --         -- if  then
+
+        --         -- end
+
+        --     end
+        -- end
+
+
+        -- Check and add tile is within bounds to generate
+
     end
+
+
+    -- for index, tileToDelete in ipairs(tilesToDelete) do
+    --     -- DeleteTile(Tiles, tileToDelete)
+    --     table.remove(Tiles, tileToDelete)
+    -- end
 
 
     -- Scan for tiles to add.
@@ -226,11 +269,14 @@ function DeleteTile(Tiles, i)
 
 end
 
-
+---Highlight the tile the player is on.
+---@param Player any
+---@param Tiles any
+---@param TileSize any
 function HighlightPlayerTile(Player, Tiles, TileSize)
 
-    local px = GetTileScalePos(Player.tr.pos[1], TileSize)
-    local pz = GetTileScalePos(Player.tr.pos[3], TileSize)
+    local px = RoundToTileSize(Player.tr.pos[1], TileSize)
+    local pz = RoundToTileSize(Player.tr.pos[3], TileSize)
 
     -- Get player pos in tile scale
     DrawBodyOutline(GetTile(px, pz).body, 1,1,1, 1)
@@ -242,6 +288,6 @@ end
 ---@param x any
 ---@param TileSize any
 ---@return integer
-function GetTileScalePos(x, TileSize)
-    return math.floor(x) - (math.floor(x) % TileSize)
+function RoundToTileSize(x, TileSize)
+    return math.floor(x) - (math.floor(x) % TileSize) -- Remove distance beyond grid point.
 end
