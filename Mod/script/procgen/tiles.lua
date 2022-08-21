@@ -181,6 +181,14 @@ function GetTile(x, z)
 end
 
 
+---The min and max positions of all tiles.
+function UpdateBoundaries()
+
+    SetBoundsMinMax(Procgen.boundaries, nil, TileSize)
+    SetContextBounds(Procgen.bounds, Vec(Grid.pos.x, 0, Grid.pos.z), TileSize)
+
+end
+
 ---
 ---@param Tiles any
 ---@param tilePos table Tile pos from origin. Example, player grid pos.
@@ -269,34 +277,6 @@ function GetTilesOutsideBoundary(Tiles, tilePos)
 end
 
 
----The min and max positions of all tiles.
-function UpdateTilesBoundaries()
-
-    Procgen.boundaries.min.x = math.huge
-    Procgen.boundaries.max.x = -math.huge
-    Procgen.boundaries.min.z = math.huge
-    Procgen.boundaries.max.z = -math.huge
-
-    -- Determine min and max x values.
-    for k, v in pairs(TileLocX) do
-        Procgen.boundaries.min.x = math.min(k, Procgen.boundaries.min.x)
-        Procgen.boundaries.max.x = math.max(k, Procgen.boundaries.max.x)
-    end
-
-    -- Determine min and max z values.
-    for k, v in pairs(TileLocZ) do
-        Procgen.boundaries.min.z = math.min(k, Procgen.boundaries.min.z)
-        Procgen.boundaries.max.z = math.max(k, Procgen.boundaries.max.z)
-    end
-
-    dbw("Procgen.boundaries.min.x", Procgen.boundaries.min.x)
-    dbw("Procgen.boundaries.max.x", Procgen.boundaries.max.x)
-    dbw("Procgen.boundaries.min.z", Procgen.boundaries.min.z)
-    dbw("Procgen.boundaries.max.z", Procgen.boundaries.max.z)
-
-end
-
-
 function ClearTiles()
 
     for _, tileShape in ipairs(FindShapes("procgen_tile", true)) do
@@ -328,6 +308,7 @@ end
 
 function RegenerateTiles()
     ClearTiles()
+    InitProcgen()
     GenerateTiles()
 end
 

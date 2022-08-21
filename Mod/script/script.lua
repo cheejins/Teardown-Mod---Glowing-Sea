@@ -1,6 +1,7 @@
 #include "debug/db.lua"
 #include "player/player.lua"
 #include "procgen/procgen.lua"
+#include "procgen/drawProcgen.lua"
 #include "procgen/tiles.lua"
 #include "ui/drawDebug.lua"
 
@@ -15,8 +16,10 @@ function Init()
     InitArgs() -- Init the args for the master script.
 
     InitPlayer()
+    InitProcgen()
     GenerateTiles()
-    GetTilesBounds()
+    UpdateBoundaries()
+
 
     print('Mod  initialized.')
 end
@@ -33,10 +36,17 @@ function Tick()
         UpdateTiles()
         ManageDynamicTiles()
         HighlightPlayerTile(Player, Tiles, TileSize)
+        -- GetTilesOutsideBoundary(Tiles, Grid.pos)
 
-        GetTilesOutsideBoundary(Tiles, Grid.pos)
 
-        UpdateTilesBoundaries()
+        UpdateBoundaries()
+
+        if showGridBoundaries then
+            -- DrawBounds(Procgen.bounds, 0,1,0, 1)
+            -- DrawBounds(Procgen.bounds, 0,1,0, 1)
+            DrawBounds(Procgen.boundaries, 0,0,1, 1)
+        end
+
 
         if InputPressed("f8") then
             RegenerateTiles()
@@ -75,12 +85,18 @@ function Draw()
         DrawWorldGrid(Player, Grid.dim.x, Grid.dim.z, TileSize)
     end
 
-    if isRunning and showGridBoundaries then
-        DrawTileBoundaries()
-    end
+end
 
 
-    -- for index, shape in ipairs(FindShapes("procgen_tile", true)) do
+---Arguements for main.lua (master script).
+function SetRunArgs(debug_script) RunArgs.debug_script = debug_script end
+function InitArgs()
+    -- if RunArgs.debug_script then DB = true end -- Debug the debugger (toggle on/off).
+end
+
+
+-- function drawTilePos()
+        -- for index, shape in ipairs(FindShapes("procgen_tile", true)) do
     --     local x = GetTagValue(shape, "x")
     --     local z = GetTagValue(shape, "z")
     --     UiPush()
@@ -105,12 +121,4 @@ function Draw()
 
     --     end
     -- end
-
-end
-
-
----Arguements for main.lua (master script).
-function SetRunArgs(debug_script) RunArgs.debug_script = debug_script end
-function InitArgs()
-    -- if RunArgs.debug_script then DB = true end -- Debug the debugger (toggle on/off).
-end
+-- end

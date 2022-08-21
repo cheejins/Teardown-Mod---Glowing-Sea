@@ -1,142 +1,75 @@
-TileSize = 4
+function InitProcgen()
 
+    TileSize = 4
 
---- Context grid.
-Grid = {
-    pos     = { x = 0,  z = 0 }, -- Selected tile.
-    dim     = { x = 12, z = 12 }, -- Draw dimensions of the grid.
-    corner  = { x = 0,  z = 0 }, -- Top left corner of the grid.
-}
+    --- Context grid.
+    Grid = {
+        pos     = { x = 0,  z = 0 }, -- Selected tile.
+        dim     = { x = 12, z = 12 }, -- Draw dimensions of the grid.
+        corner  = { x = 0,  z = 0 }, -- Top left corner of the grid.
+    }
 
--- Properties used to manage tiles.
-Procgen = {
-    pos         = { x = 0,  z = 0 },
-    initBounds  = { x = 20, z = 20 }, -- Initial tile generation dimensions.
-    bounds      = { x = 20, z = 20 }, -- Allow tiles to exist within these bounds relative to thegrid pos
-    boundaries  = { -- The tiles outside of this range will be disabled/deleted.
-        min = {
-            x = -60,
-            z = -60
-        },
-        max = {
-            x = 60,
-            z = 60
-        }
-    },
-}
+    -- Properties used to manage tiles.
+    Procgen = {
 
+        pos         = { x = 0,  z = 0 },
+        initBounds  = { x = 20, z = 20 }, -- Initial tile generation dimensions.
 
----Draw a world point grid with coordinates.
----@param gx number grid x pos.
----@param gz number grid z pos.
----@param spacing number space between points.
-function DrawWorldGrid(Player, gx, gz, spacing)
+        bounds      = CreateBounds(-40, -40, 40, 40), -- Allow tiles to exist within these bounds relative to thegrid pos
+        boundaries  = CreateBounds(-100, -100, 100, 100), -- The tiles outside of this range will be disabled/deleted.
 
-    DebugLine(Vec(0,0,0), Vec(-10,0,0), 1,0,0, 1)
-    -- DebugLine(Vec(0,0,0), Vec(0,-10,0), 0,1,0, 1)
-    DebugLine(Vec(0,0,0), Vec(0,0,-10), 0,0,1, 1)
+        container   = CreateBounds(0,0,0,0) -- The bounds that all tiles are in.
 
-    spacing = spacing or TileSize
-    local zoom = Player.camera.zoom.value
-
-    local px = RoundToTileSize(Player.tr.pos[1], TileSize)
-    local pz = RoundToTileSize(Player.tr.pos[3], TileSize)
-
-    local gxStart = -Grid.dim.x -- Bottom left corner of origin.
-    local gzStart = -Grid.dim.z
-
-    UiPush()
-        local ux, uy = UiWorldToPixel(Vec(0,0,0))
-        UiTranslate(ux, uy)
-        UiColor(1,1,1, 1)
-        UiImageBox("ui/common/dot.png", 20 * 30/zoom, 20 * 30/zoom, 0,0)
-    UiPop()
-
-    for x = gxStart, Grid.dim.x, spacing do
-        for z = gzStart, Grid.dim.z, spacing do
-
-            local pos = Vec(x + px, 0, z + pz)
-            local ux, uy = UiWorldToPixel(pos)
-
-            UiFont("bold.ttf", 100/zoom*TileSize)
-            UiAlign("center middle")
-            UiColor(0,0,0,1)
-            UiTextOutline(1,1,1, 0.5, 0.3)
-
-            UiPush()
-
-                UiTranslate(ux, uy)
-                UiImageBox("ui/common/dot.png", 8 * 40/zoom, 8 * 40/zoom, 0,0)
-
-            UiPop()
-
-            UiPush()
-
-                local pos = Vec(x + px + (spacing/2), 0, z + pz + (spacing/2))
-                local ux, uy = UiWorldToPixel(pos)
-
-                UiTranslate(ux, uy)
-                local gdx = x + px
-                local gdz = z + pz
-
-                UiAlign("right middle")
-                UiColor(1,0,0,1)
-                UiText(gdx)
-
-                UiAlign("center top")
-                UiColor(0,0,0,1)
-                UiText(",")
-
-                UiAlign("left middle")
-                UiColor(0,0,1,1)
-                UiText(gdz)
-
-            UiPop()
-
-        end
-    end
+    }
 
 end
 
 
+---Return the min and max points by iterating and comparing them.
+---@param tb_bounds any
+---@param offset any
+---@param TileSize any
+---@return any
+function SetBoundsMinMax(tb_bounds, offset, TileSize)
 
-function DrawTileBoundaries()
+    offset = offset or Vec(0,0,0)
 
-    local TL = Vec(
-        Procgen.boundaries.min.x,
-        0,
-        Procgen.boundaries.min.z
-    )
+    tb_bounds.min.x = math.huge
+    tb_bounds.max.x = -math.huge
+    tb_bounds.min.z = math.huge
+    tb_bounds.max.z = -math.huge
 
-    local TR = Vec(
-        Procgen.boundaries.max.x + TileSize,
-        0,
-        Procgen.boundaries.min.z
-    )
+    -- Determine min and max x values.
+    for k, v in pairs(TileLocX) do
+        tb_bounds.min.x = math.min(k, tb_bounds.min.x + offset[1])
+        tb_bounds.max.x = math.max(k, tb_bounds.max.x + offset[1])
+    end
 
-    local BL = Vec(
-        Procgen.boundaries.min.x,
-        0,
-        Procgen.boundaries.max.z + TileSize
-    )
+    -- Determine min and max z values.
+    for k, v in pairs(TileLocZ) do
+        tb_bounds.min.z = math.min(k, tb_bounds.min.z + offset[3])
+        tb_bounds.max.z = math.max(k, tb_bounds.max.z + offset[3])
+    end
 
-    local BR = Vec(
-        Procgen.boundaries.max.x + TileSize,
-        0,
-        Procgen.boundaries.max.z + TileSize
-    )
+    return tb_bounds
 
-
-    -- UiLine(min, max, 3, 1,0,0, 1) -- top
-    -- UiLine(min, max, 3, 1,0,0, 1) -- bottom
-    -- UiLine(uMinX, uMinZ, uMinX, uMaxZ, 3, 0,0,1, 1)
-    -- UiLine(-100, -100, 100, 100, 3, 1,0,0, 1) -- top
+end
 
 
-    DebugLine(TL, TR, 1,0,0, 1)
-    DebugLine(BL, BR, 1,0,0, 1)
+function SetContextBounds(tb_bounds, offset, TileSize)
 
-    DebugLine(TL, BL, 1,0,0, 1)
-    DebugLine(TR, BR, 1,0,0, 1)
+    offset = offset or Vec(0,0,0)
 
+    return {
+        tb_bounds.min.x + offset[1],
+        tb_bounds.max.x + offset[1],
+        tb_bounds.min.z + offset[3],
+        tb_bounds.max.z + offset[3],
+    }
+
+end
+
+
+function CreateBounds(minX, minZ, maxX, maxZ)
+    return { min = {x = minX, z = minZ}, max = {x = maxX, z = maxZ} }
 end
