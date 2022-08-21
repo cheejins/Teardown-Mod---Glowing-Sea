@@ -113,3 +113,27 @@ function DrawImage(path, pos, l, w, r, g, b, a, dt)
     if dt == nil then dt = true end
     DrawSprite(dot, spriteTr, l or 0.2, w or 0.2, r or 1, g or 1, b or 1, a or 1, dt and true)
 end
+
+function UiLine(p1, p2, w, r,g,b, a) -- Draw a straight line.
+
+    UiAlign('left middle')
+    UiColor(r,g,b, a or 1)
+
+    do UiPush()
+
+        local uMinX, uMinZ = UiWorldToPixel(min)
+        -- local uMaxX, uMaxZ = UiWorldToPixel(max)
+
+        UiTranslate(uMinX, uMinZ)
+
+        local dist = VecDist(p1, p2)
+        local angle = VecAngle(p1, p2)
+
+        margin(x1, y1)
+
+        UiRotate(angle)
+        UiRect(dist, w or 2) -- Draw line with the length of the hypotenuse.
+
+    UiPop() end
+
+end

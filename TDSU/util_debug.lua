@@ -16,22 +16,30 @@ end
 function TickDebug(DB, db)
 
     DB = GetBool('savegame.mod.debugModeMaster')
-    if InputDown('backspace') and InputPressed('f1') then
-        SetBool('savegame.mod.debugModeMaster', not GetBool('savegame.mod.debugModeMaster'))
-        DB = GetBool('savegame.mod.debugModeMaster')
-        print("DB mode: " .. ternary(DB, 'on\t', 'off\t') .. sfnTime())
-        ternary(DB, beepOn, beepOff)()
+    if InputDown('pgup') and InputPressed('f1') then
+        ToggleDB()
     end
 
     db = GetBool('savegame.mod.debugMode')
-    if InputDown('backspace') and InputPressed('f2') then
-        SetBool('savegame.mod.debugMode', not GetBool('savegame.mod.debugMode'))
-        db = GetBool('savegame.mod.debugMode')
-
-        print("db mode: " .. ternary(db, 'on\t', 'off\t') .. sfnTime())
-        ternary(db, beepOn, beepOff)()
+    if InputDown('pgup') and InputPressed('f2') then
+        ToggleDb()
     end
 
+end
+
+
+function ToggleDb()
+    SetBool('savegame.mod.debugMode', not GetBool('savegame.mod.debugMode'))
+    db = GetBool('savegame.mod.debugMode')
+    print("db mode: " .. ternary(db, 'on\t', 'off\t') .. sfnTime())
+    -- ternary(db, beepOn, beepOff)()
+end
+
+function ToggleDB()
+    SetBool('savegame.mod.debugModeMaster', not GetBool('savegame.mod.debugModeMaster'))
+    DB = GetBool('savegame.mod.debugModeMaster')
+    print("DB mode: " .. ternary(DB, 'on\t', 'off\t') .. sfnTime())
+    -- ternary(DB, beepOn, beepOff)()
 end
 
 

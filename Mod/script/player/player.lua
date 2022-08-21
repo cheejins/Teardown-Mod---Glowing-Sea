@@ -71,14 +71,22 @@ function PlayerRunMovement()
 
     if moving then
 
+        local speed = ternary(InputDown("shift"), movement.speed * 2, movement.speed)
+
         moveDir = VecNormalize(moveDir)
         if VecLength(vel) <= 10 then -- Check if under velocity limit.
-            SetBodyVelocity(Player.body, VecScale(VecNormalize(moveDir), movement.speed)) -- Move player. Normalize movement direction.
+            SetBodyVelocity(Player.body, VecScale(VecNormalize(moveDir), speed)) -- Move player. Normalize movement direction.
         end
 
     else
         SetBodyVelocity(Player.body, Vec(0,0,0)) -- Slow player down when no movement key is active.
     end
+
+    local bTr = GetBodyTransform(Player.body)
+    local bTrNew = Transform(AutoVecSubsituteY(bTr.pos, 2), QuatEuler(0,0,0))
+    SetBodyTransform(Player.body, bTrNew)
+    SetBodyAngularVelocity(Player.body, Vec(0,0,0))
+    -- SetBodyVelocity(Player.body, Vec(0,0,0))
 
 end
 

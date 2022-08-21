@@ -59,6 +59,19 @@ do
 
 end
 
+function avg(a, b)
+    return (a+b)/2
+end
+function slope(x1, y1, x2, y2)
+    return (y2-y1)/(x2-x1)
+end
+function hyp(x, y) --- Return hypotenuse.
+    return math.sqrt(x^2 + y^2)
+end
+
+function myDot(a, b) return (a[1] * b[1]) + (a[2] * b[2]) + (a[3] * b[3]) end
+function myMag(a) return math.sqrt((a[1] * a[1]) + (a[2] * a[2]) + (a[3] * a[3])) end
+
 
 --[[QUERY]]
 do

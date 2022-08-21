@@ -1,5 +1,6 @@
 #include "Mod/script/script.lua"
 #include "TDSU/tdsu.lua"
+#include "Automatic.lua"
 
 
 --================================================
