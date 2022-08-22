@@ -12,6 +12,12 @@
 #include "util_vfx.lua"
 
 
+--================================================================
+--Teardown Scripting Utilities Library (TDSU)
+--By: Cheejins
+--================================================================
+
+
 _BOOLS = {} -- Control variable used for functions like CallOnce()
 
 

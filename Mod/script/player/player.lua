@@ -6,7 +6,7 @@ Player = {
 
     camera = {
         tr = Transform(),
-        zoom = { value = 10, min = 10, max = 100, rate = 5 },
+        zoom = { value = 10, min = 10, max = 150, rate = 5 },
         pan = { value = 0, min = 1, max = 10, rate = 3 },
     },
 
@@ -50,6 +50,9 @@ function TickPlayer()
         PlayerRunCamera()
         PlayerRunMovement()
     end
+
+    SetPlayerTransform(Transform(Vec(0,1000,0)))
+    SetPlayerVelocity(Vec(0,0,0))
 
 end
 

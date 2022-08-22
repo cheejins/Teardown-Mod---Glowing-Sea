@@ -14,8 +14,10 @@ function DrawWorldGrid(Player, gx, gz, spacing)
     local px = RoundToCellSize(Player.tr.pos[1], TileSize)
     local pz = RoundToCellSize(Player.tr.pos[3], TileSize)
 
-    local gxStart = -Grid.dim.x -- Bottom left corner of origin.
-    local gzStart = -Grid.dim.z
+    -- local gxStart = -Grid.dim[1] -- Bottom left corner of origin.
+    -- local gzStart = -Grid.dim[3]
+
+    local pb = Procgen.bounds
 
     UiPush()
         local ux, uy = UiWorldToPixel(Vec(0,0,0))
@@ -24,8 +26,8 @@ function DrawWorldGrid(Player, gx, gz, spacing)
         UiImageBox("ui/common/dot.png", 20 * 30/zoom, 20 * 30/zoom, 0,0)
     UiPop()
 
-    for x = gxStart, Grid.dim.x, spacing do
-        for z = gzStart, Grid.dim.z, spacing do
+    for x = pb.min[1], pb.max[1], spacing do
+        for z = pb.min[3], pb.max[3], spacing do
 
             local pos = Vec(x + px, 0, z + pz)
             local ux, uy = UiWorldToPixel(pos)
