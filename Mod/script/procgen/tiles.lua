@@ -15,15 +15,15 @@ function UpdateTiles()
 
     -- Set grid pos to player pos.
     Grid.pos = Vec(
-        RoundToTileSize(Player.tr.pos[1], TileSize),
+        RoundToCellSize(Player.tr.pos[1], TileSize),
         0,
-        RoundToTileSize(Player.tr.pos[3], TileSize)
+        RoundToCellSize(Player.tr.pos[3], TileSize)
     )
 
     -- Set grid pos to camera pos.
     Grid.pos = {
-        x = RoundToTileSize(Player.camera.tr.pos[1], TileSize),
-        z = RoundToTileSize(Player.camera.tr.pos[3], TileSize)
+        x = RoundToCellSize(Player.camera.tr.pos[1], TileSize),
+        z = RoundToCellSize(Player.camera.tr.pos[3], TileSize)
     }
 
     local shapes = FindShapes("procgen_tile", true)
@@ -39,8 +39,8 @@ function ManageDynamicTiles()
 
     -- Create new tiles within grid context
 
-    local px = RoundToTileSize(Player.tr.pos[1], TileSize)
-    local pz = RoundToTileSize(Player.tr.pos[3], TileSize)
+    local px = RoundToCellSize(Player.tr.pos[1], TileSize)
+    local pz = RoundToCellSize(Player.tr.pos[3], TileSize)
 
     for x = -Grid.dim.x + px, Grid.dim.x + px, TileSize do
         for z = -Grid.dim.z + pz, Grid.dim.z + pz, TileSize do
@@ -183,96 +183,14 @@ end
 
 ---The min and max positions of all tiles.
 function UpdateBoundaries()
-
     SetBoundsMinMax(Procgen.boundaries, nil, TileSize)
     SetContextBounds(Procgen.bounds, Vec(Grid.pos.x, 0, Grid.pos.z), TileSize)
-
 end
 
 ---
 ---@param Tiles any
 ---@param tilePos table Tile pos from origin. Example, player grid pos.
 function GetTilesOutsideBoundary(Tiles, tilePos)
-
-    -- local pgd = Procgen.boundaries
-
-    -- for x =  do
-    --     for z =  do
-
-    --     end
-    -- end
-
-    -- local i = -25 + tilePos[1] -TileSize
-    -- local lim = -100 + tilePos[1]
-
-    -- -- Delete lower set
-    -- for x = i, lim, -TileSize do
-    --     if TileLocX[x] then
-    --         for tz, tl in pairs(TileLocX[x]) do -- All tiles in row x
-
-    --             DrawBodyHighlight(TileLocX[x][tz].body, 1)
-
-    --             if InputPressed("lmb") then
-
-    --                 -- DeleteTile(Tiles, TileLocX[x][tz].index)
-
-    --                 local tile = TileLocX[x][tz]
-    --                 print(tile.pos)
-
-    --                 -- Tiles[]
-
-    --             end
-
-    --         end
-    --     end
-    -- end
-
-
-    -- -- Delete higher set
-    -- for x = 25 + tilePos[1] + TileSize, 100 + tilePos[1], TileSize do
-    --     if TileLocX[x] then
-    --         for tz, tl in pairs(TileLocX[x]) do -- All tiles in row x
-
-    --             DrawBodyHighlight(TileLocX[x][tz].body, 1)
-
-    --             if InputPressed("lmb") then
-    --                 DeleteTile(Tiles, GetTile(x, tz).index)
-    --             end
-
-    --         end
-    --     end
-    -- end
-
-
-    -- -- Delete lower set
-    -- for z = -25 + tilePos[3] -TileSize, -100 + tilePos[3], -TileSize do
-    --     if TileLocZ[z] then
-    --         for tz, tl in pairs(TileLocZ[z]) do -- All tiles in row x
-
-    --             DrawBodyHighlight(TileLocZ[z][tz].body, 1)
-
-    --             if InputPressed("lmb") then
-    --                 DeleteTile(Tiles, GetTile(tz, z).index)
-    --             end
-
-    --         end
-    --     end
-    -- end
-
-    -- -- Delete higher set
-    -- for z = 25 + tilePos[3] + TileSize, 100 + tilePos[3], TileSize do
-    --     if TileLocZ[z] then
-    --         for tz, tl in pairs(TileLocZ[z]) do -- All tiles in row x
-
-    --             DrawBodyHighlight(TileLocZ[z][tz].body, 1)
-
-    --             if InputPressed("lmb") then
-    --                 DeleteTile(Tiles, GetTile(tz, z).index)
-    --             end
-
-    --         end
-    --     end
-    -- end
 
 end
 
@@ -297,15 +215,6 @@ function DeleteTile(Tiles, i)
 end
 
 
----Get a value closest to tile spacing of the grid.
----@param x number
----@param TileSize any
----@return integer
-function RoundToTileSize(x, TileSize)
-    return x - (x % TileSize) -- Remove distance beyond grid point.
-end
-
-
 function RegenerateTiles()
     ClearTiles()
     InitProcgen()
@@ -319,8 +228,8 @@ end
 ---@param TileSize any
 function HighlightPlayerTile(Player, Tiles, TileSize)
 
-    local px = RoundToTileSize(Player.tr.pos[1], TileSize)
-    local pz = RoundToTileSize(Player.tr.pos[3], TileSize)
+    local px = RoundToCellSize(Player.tr.pos[1], TileSize)
+    local pz = RoundToCellSize(Player.tr.pos[3], TileSize)
 
     local tile = GetTile(px, pz)
 
@@ -339,50 +248,31 @@ end
 
 function FlashTiles()
 
-    lastTime1 = lastTime1 or 0
+    flashCount = 4
 
-    rx1 = rx1 or RoundToTileSize(math.random(-Grid.dim.x, Grid.dim.x) + Grid.pos.x, TileSize)
-    rz1 = rz1 or RoundToTileSize(math.random(-Grid.dim.z, Grid.dim.z) - Grid.pos.z, TileSize)
+    FlashTiles = FlashTiles or {}
 
-    if GetTime() - lastTime1 >= 1/4 then
-        lastTime1 = GetTime()
-        rx1 = RoundToTileSize(math.random(-Grid.dim.x, Grid.dim.x) + Grid.pos.x, TileSize)
-        rz1 = RoundToTileSize(math.random(-Grid.dim.z, Grid.dim.z) - Grid.pos.z, TileSize)
+    for i = 1, flashCount do
+
+        flash = FlashTiles[flashCount]
+
+        lastTime1 = lastTime1 or 0
+
+        rx1 = rx1 or RoundToCellSize(math.random(-Grid.dim.x, Grid.dim.x) + Grid.pos.x, TileSize)
+        rz1 = rz1 or RoundToCellSize(math.random(-Grid.dim.z, Grid.dim.z) - Grid.pos.z, TileSize)
+
+        if GetTime() - lastTime1 >= 1/4 then
+            lastTime1 = GetTime()
+            rx1 = RoundToCellSize(math.random(-Grid.dim.x, Grid.dim.x) + Grid.pos.x, TileSize)
+            rz1 = RoundToCellSize(math.random(-Grid.dim.z, Grid.dim.z) - Grid.pos.z, TileSize)
+        end
+
+        local tile = GetTile(rx1, -rz1)
+        DrawBodyOutline(tile.body, 1,1,1, 1)
+
     end
 
-    local tile = GetTile(rx1, -rz1)
-    DrawBodyOutline(tile.body, 1,1,1, 1)
+end
 
-
-
-    lastTime2 = lastTime2 or 0
-
-    rx2 = rx2 or RoundToTileSize(math.random(-Grid.dim.x, Grid.dim.x) + Grid.pos.x, TileSize)
-    rz2 = rz2 or RoundToTileSize(math.random(-Grid.dim.z, Grid.dim.z) - Grid.pos.z, TileSize)
-
-    if GetTime() - lastTime2 >= 1/4 then
-        lastTime2 = GetTime()
-        rx2 = RoundToTileSize(math.random(-Grid.dim.x, Grid.dim.x) + Grid.pos.x, TileSize)
-        rz2 = RoundToTileSize(math.random(-Grid.dim.z, Grid.dim.z) - Grid.pos.z, TileSize)
-    end
-
-    local tile = GetTile(rx2, -rz2)
-    DrawBodyOutline(tile.body, 1,1,1, 1)
-
-
-
-    lastTime3 = lastTime3 or 0
-
-    rx3 = rx3 or RoundToTileSize(math.random(-Grid.dim.x, Grid.dim.x) + Grid.pos.x, TileSize)
-    rz3 = rz3 or RoundToTileSize(math.random(-Grid.dim.z, Grid.dim.z) - Grid.pos.z, TileSize)
-
-    if GetTime() - lastTime3 >= 1/4 then
-        lastTime3 = GetTime()
-        rx3 = RoundToTileSize(math.random(-Grid.dim.x, Grid.dim.x) + Grid.pos.x, TileSize)
-        rz3 = RoundToTileSize(math.random(-Grid.dim.z, Grid.dim.z) - Grid.pos.z, TileSize)
-    end
-
-    local tile = GetTile(rx3, -rz3)
-    DrawBodyOutline(tile.body, 1,1,1, 1)
-
+function CreateFlasheObjects(flashCount)
 end

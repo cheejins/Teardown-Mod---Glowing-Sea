@@ -40,8 +40,8 @@ function TickPlayer()
     Player.tr = GetBodyTransform(Player.body)
     Player.tr.pos = AabbGetBodyCenterPos(Player.body)
 
-    Player.gridTr.pos[1] = RoundToTileSize(Player.tr.pos[1], TileSize)
-    Player.gridTr.pos[3] = RoundToTileSize(Player.tr.pos[3], TileSize)
+    Player.gridTr.pos[1] = RoundToCellSize(Player.tr.pos[1], TileSize)
+    Player.gridTr.pos[3] = RoundToCellSize(Player.tr.pos[3], TileSize)
 
     DrawBodyOutline(Player.body, 0,1,0.5, 1)
     PointLight(VecAdd(Player.tr.pos, Vec(0, 0.5, 0)), 1,1,1, 0.5)

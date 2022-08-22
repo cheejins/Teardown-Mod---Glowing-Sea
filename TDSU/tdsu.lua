@@ -12,6 +12,9 @@
 #include "util_vfx.lua"
 
 
+_BOOLS = {} -- Control variable used for functions like CallOnce()
+
+
 ---INIT Initialize the utils library.
 function InitUtils()
 

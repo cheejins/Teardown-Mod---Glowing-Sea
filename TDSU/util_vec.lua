@@ -1,19 +1,19 @@
 --[[VECTORS]]
 do
     --- Distance between two vectors.
-    VecDist = function(a, b) return VecLength(VecSub(a, b)) end
+    VecDist = function(v1, v2) return VecLength(VecSub(v1, v2)) end
 
     --- Divide a vector by another vector's components.
-    VecDiv = function(a, b) return Vec(a[1] / b[1], a[2] / b[2], a[3] / b[3]) end
+    VecDiv = function(v1, v2) return Vec(v1[1] / v2[1], v1[2] / v2[2], v1[3] / v2[3]) end
 
-    VecMult = function(vec1, vec2)
-        local vec = Vec(0,0,0)
-        for i = 1, 3 do vec[i] = vec1[i] * vec2[i] end
-        return vec
+    VecMult = function(v1, v2)
+        local v = Vec(0,0,0)
+        for i = 1, 3 do v[i] = v1[i] * v2[i] end
+        return v
     end
 
     --- Add a table of vectors together.
-    VecAddAll = function(vtb) local v = Vec(0,0,0) for i = 1, #vtb do VecAdd(v, vtb[i]) end return v end
+    VecAddAll = function(tb_vecs) local v = Vec(0,0,0) for i = 1, #tb_vecs do VecAdd(v, tb_vecs[i]) end return v end
 
     --- Returns a vector with random values.
     VecRandom = function(length)
@@ -23,28 +23,51 @@ do
 
     --- Print QuatEulers or vectors.
     VecPrint = function(vec, label, decimals)
-        DebugPrint((label or "") ..
-        "  " .. sfn(vec[1], decimals or 2) ..
-        "  " .. sfn(vec[2], decimals or 2) ..
-        "  " .. sfn(vec[3], decimals or 2))
+
+        local str = (label or "")
+
+        str = string_append(str, sfn(vec[1], decimals))
+        str = string_append(str, sfn(vec[2], decimals), ", ")
+        str = string_append(str, sfn(vec[3], decimals), ", ")
+
+        str = string_enclose(str, "{", " }")
+
+        DebugPrint(str)
+        print(str)
+
     end
 
-    ---Move a point towards another point at a specified speed.
-    ---@param startPos table
-    ---@param endPos table
-    ---@param speed number
-    VecApproach = function(startPos, endPos, speed)
-        local subtractedPos = VecScale(VecNormalize(VecSub(endPos, startPos)), speed)
-        return VecAdd(startPos, subtractedPos)
+    ---Move a point towards another point for a specified distance.
+    VecApproach = function(vec_start, vec_end, dist)
+        local sub_pos = VecScale(VecNormalize(VecSub(vec_end, vec_start)), dist)
+        return VecAdd(vec_start, sub_pos)
     end
+
+    ---Average vector between two vectors.
+    VecAvg = function(v1, v2) return VecScale(VecAdd(v1, v2), 1/2) end
+
+    ---Return the x value of a Vec.
+    vx = function(v) return v[1] or v.x end
+
+    ---Return the y value of a Vec.
+    vy = function(v) return v[2] or v.y end
+
+    ---Return the z value of a Vec.
+    vz = function(v) return v[3] or v.z end
+
+    ---Takes a table a like { x = 0, y = 0, z = 0 } and converts it to Vec(0,0,0)
+    ToVec = function(v) return Vec(v.x, v.y, v.z) end
+
+    ---Takes a Vec like and Vec(0,0,0) converts it to { x = 0, y = 0, z = 0 }
+    ToCompVec = function(v) return { x = v[1], y = v[2], z = v[3] } end
 
 end
 
 
 --[[AABB]]
 do
-    function AabbDimensions(min, max) return Vec(max[1] - min[1], max[2] - min[2], max[3] - min[3]) end
-    function AabbDraw(v1, v2, r, g, b, a)
+    AabbDimensions = function(min, max) return Vec(max[1] - min[1], max[2] - min[2], max[3] - min[3]) end
+    AabbDraw = function(v1, v2, r, g, b, a)
         r = r or 1 g = g or 1 b = b or 1 a = a or 1
         local x1 = v1[1] local y1 = v1[2] local z1 = v1[3] local x2 = v2[1] local y2 = v2[2] local z2 = v2[3]
         -- x lines top
@@ -65,20 +88,19 @@ do
         DebugLine(Vec(x1,y1,z2), Vec(x1,y1,z1), r, g, b, a)
         DebugLine(Vec(x1,y2,z2), Vec(x1,y2,z1), r, g, b, a)
     end
-    function AabbCheckOverlap(aMin, aMax, bMin, bMax)
+    AabbCheckOverlap = function(aMin, aMax, bMin, bMax)
         return
         (aMin[1] <= bMax[1] and aMax[1] >= bMin[1]) and
         (aMin[2] <= bMax[2] and aMax[2] >= bMin[2]) and
         (aMin[3] <= bMax[3] and aMax[3] >= bMin[3])
     end
-    function AabbCheckPointInside(aMin, aMax, pos)
+    AabbCheckPointInside = function(aMin, aMax, pos)
         return
         (pos[1] <= aMax[1] and pos[1] >= aMin[1]) and
         (pos[2] <= aMax[2] and pos[2] >= aMin[2]) and
         (pos[3] <= aMax[3] and pos[3] >= aMin[3])
     end
-    function AabbClosestEdge(pos, shape)
-
+    AabbClosestEdge = function(pos, shape)
         local shapeAabbMin, shapeAabbMax = GetShapeBounds(shape)
         local bCenterY = VecLerp(shapeAabbMin, shapeAabbMax, 0.5)[2]
         local edges = {}
@@ -103,7 +125,7 @@ do
         return closestEdge, index
     end
     --- Sort edges by closest to startPos and closest to endPos. Return sorted table.
-    function AabbSortEdges(startPos, endPos, edges)
+    AabbSortEdges = function(startPos, endPos, edges)
         local s, startIndex = aabbClosestEdge(startPos, edges)
         local e, endIndex = aabbClosestEdge(endPos, edges)
         --- Swap first index with startPos and last index with endPos. Everything between stays same.
@@ -111,22 +133,22 @@ do
         edges = tableSwapIndex(edges, #edges, endIndex)
         return edges
     end
-    function AabbGetShapeCenterPos(shape)
+    AabbGetShapeCenterPos = function(shape)
         local mi, ma = GetShapeBounds(shape)
         return VecLerp(mi,ma,0.5)
     end
-    function AabbGetBodyCenterPos(body)
+    AabbGetBodyCenterPos = function(body)
         local mi, ma = GetBodyBounds(body)
         return VecLerp(mi,ma,0.5)
     end
-    function AabbGetShapeCenterTopPos(shape, addY)
+    AabbGetShapeCenterTopPos = function(shape, addY)
         addY = addY or 0
         local mi, ma = GetShapeBounds(shape)
         local v =  VecLerp(mi,ma,0.5)
         v[2] = ma[2] + addY
         return v
     end
-    function AabbGetBodyCenterTopPos(body, addY)
+    AabbGetBodyCenterTopPos = function(body, addY)
         addY = addY or 0
         local mi, ma = GetBodyBounds(body)
         local v =  VecLerp(mi,ma,0.5)
@@ -137,7 +159,7 @@ end
 
 --[[OBB]]
 do
-    function ObbDrawShape(shape)
+    ObbDrawShape = function(shape)
 
         local shapeTr = GetShapeWorldTransform(shape)
         local shapeDim = VecScale(Vec(sx, sy, sz), 0.1)
@@ -161,13 +183,13 @@ end
 --[[PHYSICS]]
 do
     -- Reduce the angular body velocity by a certain rate each frame.
-    function DiminishBodyAngVel(body, rate)
-        local angVel = GetBodyAngularVelocity(body)
+    DiminishBodyAngVel = function(body, rate)
+        local av = GetBodyAngularVelocity(body)
         local dRate = rate or 0.99
-        local diminishedAngVel = Vec(angVel[1]*dRate, angVel[2]*dRate, angVel[3]*dRate)
+        local diminishedAngVel = Vec(av[1]*dRate, av[2]*dRate, av[3]*dRate)
         SetBodyAngularVelocity(body, diminishedAngVel)
     end
-    function IsMaterialUnbreakable(mat, shape)
+    IsMaterialUnbreakable = function(mat, shape)
         return mat == 'rock' or mat == 'heavymetal' or mat == 'unbreakable' or mat == 'hardmasonry' or
             HasTag(shape,'unbreakable') or HasTag(GetShapeBody(shape),'unbreakable')
     end
@@ -199,13 +221,13 @@ GetCrosshairCameraTr = function(pos, x, y)
 
 end
 
-function DebugPath(tb_points, tb_color, a, dots, dots_size)
-    if tb_points >= 2 then
+DebugPath = function(tb_points, tb_color, a, dots, dots_size)
+    if #tb_points >= 2 then
         for i = 1, #tb_points - 1 do -- Stop at the second last point.
-            dbl(tb_points[i], tb_points[i+1], table.unpack(tb_color), a or 1)
+            dbl(tb_points[i], tb_points[i+1], 1,1,1,1)
             if dots then
-                DrawDot(tb_points[1], dots_size or 0.5, dots_size or 0.5, table.unpack(tb_color or Colors.white))
-                DrawDot(tb_points[#tb_points], dots_size or 0.5, dots_size or 0.5, table.unpack(tb_color or Colors.white))
+                DrawDot(tb_points[1], dots_size or 0.5, dots_size or 0.5, unpack(tb_color or Colors.white))
+                DrawDot(tb_points[#tb_points], dots_size or 0.5, dots_size or 0.5, unpack(tb_color or Colors.white))
             end
         end
     end

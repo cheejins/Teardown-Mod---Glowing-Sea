@@ -1,4 +1,4 @@
-#include "Mod/script/script.lua"
+#include "script.lua"
 #include "TDSU/tdsu.lua"
 #include "Automatic.lua"
 

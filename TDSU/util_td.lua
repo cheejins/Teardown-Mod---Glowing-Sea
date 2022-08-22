@@ -2,19 +2,19 @@
 do
 
     function TimerCreate(time, rpm)
-        return {time = time, rpm = rpm}
+        return DeepCopy({time = time, rpm = rpm})
     end
 
     ---Run a timer and a table of functions.
     ---@param timer table -- = {time, rpm}
-    ---@param functions table -- Table of functions that are called when time = 0.
+    ---@param funcs_and_args table -- Table of functions that are called when time = 0. functions = {{func = func, args = {args}}}
     ---@param runTime boolean -- Decrement time when calling this function.
-    function TimerRunTimer(timer, functions, runTime)
+    function TimerRunTimer(timer, funcs_and_args, runTime)
         if timer.time <= 0 then
             TimerResetTime(timer)
 
-            for i = 1, #functions do
-                functions[i]()
+            for i = 1, #funcs_and_args do
+                funcs_and_args[i]()
             end
 
         elseif runTime then
@@ -46,67 +46,52 @@ do
 end
 
 
-function handleCommand(cmd)
-    HandleQuickload(cmd)
-end
+-- function CheckExplosions(cmd)
 
+--     words = splitString(cmd, " ")
+--     if #words == 5 then
+--         if words[1] == "explosion" then
 
-function CheckExplosions(cmd)
+--             local strength = tonumber(words[2])
+--             local x = tonumber(words[3])
+--             local y = tonumber(words[4])
+--             local z = tonumber(words[5])
 
-    words = splitString(cmd, " ")
-    if #words == 5 then
-        if words[1] == "explosion" then
+--             -- DebugPrint('explosion: ')
+--             -- DebugPrint('strength: ' .. strength)
+--             -- DebugPrint('x: ' .. x)
+--             -- DebugPrint('y: ' .. y)
+--             -- DebugPrint('z: ' .. z)
+--             -- DebugPrint('')
 
-            local strength = tonumber(words[2])
-            local x = tonumber(words[3])
-            local y = tonumber(words[4])
-            local z = tonumber(words[5])
+--         end
+--     end
 
-            -- DebugPrint('explosion: ')
-            -- DebugPrint('strength: ' .. strength)
-            -- DebugPrint('x: ' .. x)
-            -- DebugPrint('y: ' .. y)
-            -- DebugPrint('z: ' .. z)
-            -- DebugPrint('')
+--     if #words == 8 then
+--         if words[1] == "shot" then
 
-        end
-    end
+--             local strength = tonumber(words[2])
+--             local x = tonumber(words[3])
+--             local y = tonumber(words[4])
+--             local z = tonumber(words[5])
+--             local dx = tonumber(words[6])
+--             local dy = tonumber(words[7])
+--             local dz = tonumber(words[8])
 
-    if #words == 8 then
-        if words[1] == "shot" then
+--             -- DebugPrint('shot: ')
+--             -- DebugPrint('strength: ' .. strength)
+--             -- DebugPrint('x: ' .. x)
+--             -- DebugPrint('y: ' .. y)
+--             -- DebugPrint('z: ' .. z)
+--             -- DebugPrint('dx: ' .. dx)
+--             -- DebugPrint('dy: ' .. dy)
+--             -- DebugPrint('dz: ' .. dz)
+--             -- DebugPrint('')
 
-            local strength = tonumber(words[2])
-            local x = tonumber(words[3])
-            local y = tonumber(words[4])
-            local z = tonumber(words[5])
-            local dx = tonumber(words[6])
-            local dy = tonumber(words[7])
-            local dz = tonumber(words[8])
+--         end
+--     end
 
-            -- DebugPrint('shot: ')
-            -- DebugPrint('strength: ' .. strength)
-            -- DebugPrint('x: ' .. x)
-            -- DebugPrint('y: ' .. y)
-            -- DebugPrint('z: ' .. z)
-            -- DebugPrint('dx: ' .. dx)
-            -- DebugPrint('dy: ' .. dy)
-            -- DebugPrint('dz: ' .. dz)
-            -- DebugPrint('')
-
-        end
-    end
-
-end
-
-function HandleQuickload(cmd)
-    local words = splitString(cmd, " ")
-    for index, word in ipairs(words) do
-        if word == "quickload" then
-
-        end
-        break
-    end
-end
+-- end
 
 
 function AimSteerVehicle()

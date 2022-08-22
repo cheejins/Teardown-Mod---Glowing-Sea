@@ -133,6 +133,15 @@ do
 end
 
 
+function string_append(s, str, separator)
+    return s .. (separator or " ") .. str
+end
+
+function string_enclose(s, str_left, str_right)
+    return str_left .. s .. (str_right or str_left)
+end
+
+
 function IsStringInteger(data)
     for i = 1, #data do
 
@@ -145,3 +154,7 @@ function IsStringInteger(data)
     end
     return true
 end
+
+
+-- function CallOnce()
+-- end
