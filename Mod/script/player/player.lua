@@ -100,7 +100,6 @@ function PlayerRunCamera()
     local zoomNew = zoom.value - (InputValue("mousewheel") * zoom.rate)
     zoom.value = Clamp(zoomNew, zoom.min, zoom.max)
 
-
     -- -- Pan camera.
     -- local cam = Player.camera
     -- cam.tr.pos[1] = cam.tr.pos[1] - InputValue("mousedx")/100 * cam.pan.rate

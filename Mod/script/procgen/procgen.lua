@@ -4,12 +4,10 @@ function InitProcgen()
 
     -- Properties used to manage tiles.
     Procgen = {
-
-        initBounds  = CreateBounds2dBox(2,  TileSize),  -- Initial tile generation bounds from center of the grid.
-        bounds      = CreateBounds2dBox(4,  TileSize),  -- The bounds that all tiles are in.
-        boundaries  = CreateBounds2dBox(10, TileSize), -- The tiles outside of this range will be disabled/deleted.
-        container   = CreateBounds2dBox(10, TileSize)  -- Allow tiles to exist within these bounds relative to thegrid pos
-
+        initBounds  = CreateBounds2dBox(8,  TileSize),  -- Initial tile generation bounds from center of the grid.
+        bounds      = CreateBounds2dBox(1,  TileSize),  -- The bounds that all tiles are in.
+        boundaries  = CreateBounds2dBox(1, TileSize), -- The tiles outside of this range will be disabled/deleted.
+        container   = CreateBounds2dBox(8, TileSize)  -- Allow tiles to exist within these bounds relative to thegrid pos
     }
 
 end
@@ -20,25 +18,26 @@ function ManageDynamicTileGeneration()
     -- Balance between deleting and spawning old and new tiles sequentially. (spread out linear processing to reduce lag spikes).
     -- Create new tiles within grid context
 
-
-    local tiles = {} -- Tile indexes to spawn or delete.
-
-
-    local px = RoundToCellSize(Player.tr.pos[1], TileSize)
-    local pz = RoundToCellSize(Player.tr.pos[3], TileSize)
+    local px = Player.gridTr.pos[1]
+    local pz = Player.gridTr.pos[3]
 
     for x = Procgen.bounds.min[1] + px, Procgen.bounds.max[1] + px, TileSize do
         for z = Procgen.bounds.min[3] + pz, Procgen.bounds.max[3] + pz, TileSize do
 
-            if controls.spawnTile then
+            if controls.spawnTile then -- Manual spawn and delete.
 
-                SpawnDynamicTile(Vec(x, 0, z))
+                if not CheckTileValid(x, z) then
+                    SpawnDynamicTile(Vec(x, 0, z)) --todo fix returns to prevent needing to use GetTile() below.
+                else
+                    dbp("Tile already exists: " .. x .. ", " .. z)
+                end
 
             elseif controls.deleteTile then
 
                 if CheckTileValid(x, z) then
-                    -- print("tile = ", x, z)
-                    Explosion(GetTile(x,z).tr.pos, 1)
+                    DeleteTile(Tiles, x, z)
+                else
+                    dbp("Tile invalid: " .. x .. ", " .. z)
                 end
 
             end
@@ -46,9 +45,58 @@ function ManageDynamicTileGeneration()
         end
     end
 
-    -- for  do
-    --     DeleteTile(Tiles, GetTile(x, z).index)
-    -- end
+
+    local pb = Procgen.boundaries
+    local pc = Procgen.container
+
+
+    for bx = pb.min[1], pb.max[1], TileSize do
+
+        if TileLocX[bx] and (bx < pc.min[1] + px) or (bx > pc.max[1] + px) then
+
+            for tz, _ in pairs(TileLocX[bx]) do -- All tiles in row x
+
+                if CheckTileValid(bx, tz) then
+
+                    if config.deleteOutsideBoundaries then
+                        DeleteTile(Tiles, bx, tz)
+                    else
+                        DrawBodyHighlight(TileLocX[bx][tz].body, 1)
+                    end
+
+
+                end
+
+            end
+
+        end
+
+    end
+
+
+    for bz = pb.min[3], pb.max[3], TileSize do
+
+        if TileLocZ[bz] and (bz < pc.min[3] + pz) or (bz > pc.max[3] + pz ) then
+
+            for tx, _ in pairs(TileLocZ[bz]) do -- All tiles in row x
+
+                if CheckTileValid(tx, bz) then
+
+                    if config.deleteOutsideBoundaries then
+                        DeleteTile(Tiles, tx, bz)
+                    else
+                        DrawBodyHighlight(TileLocZ[bz][tx].body, 1)
+                    end
+
+
+                end
+
+            end
+
+        end
+
+    end
+
 
 end
 
@@ -60,8 +108,12 @@ function SpawnDynamicTile(grid_pos)
     end
 
     if not TileLocX[grid_pos[1]][grid_pos[3]] then
+
         local tile = CreateTile(grid_pos[1], grid_pos[3], TileSize)
         SpawnTile(tile, TileSize)
+
+        return tile
+
     end
 
 end
@@ -98,11 +150,8 @@ end
 ---@return table
 function CreateTile(x, z, tileSize, color)
 
-    lastColor = lastColor or Vec(0.5, 0.5, 0.5)
-
-    for i = 1, 3 do
-        lastColor[i] = lastColor[i] + (math.random() - 0.5)/5
-    end
+    -- lastColor = lastColor or Vec(0.5, 0.5, 0.5)
+    -- for i = 1, 3 do lastColor[i] = lastColor[i] + (math.random() - 0.5)/5 end
 
     local tile = {
         index = TileIndex,
@@ -120,9 +169,10 @@ function CreateTile(x, z, tileSize, color)
     }
 
     -- Add tile to Tiles.
-    table.insert(Tiles, tile)
+    Tiles[TileIndex] = tile
 
-    -- Used to reference tile by location.
+
+    -- Used to reference tile by x.
     if not TileLocX[x] then
         TileLocX[x] = {} -- Create a x row if it does not exist.
         TileLocX[x][z] = tile
@@ -130,7 +180,7 @@ function CreateTile(x, z, tileSize, color)
         TileLocX[x][z] = tile
     end
 
-    -- Used to reference tile by location.
+    -- Used to reference tile by z.
     if not TileLocZ[z] then
         TileLocZ[z] = {} -- Create a z row if it does not ezist.
         TileLocZ[z][x] = tile
@@ -176,5 +226,7 @@ function SpawnTile(tile, TileSize)
     end
 
     tile.spawned = true
+
+    return tile
 
 end

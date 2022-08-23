@@ -49,6 +49,12 @@ do
         return tb
     end
 
+    function TableLength(tb)
+        local s = 0
+        for _ in pairs(tb) do s = s + 1 end
+        return s
+    end
+
 end
 
 

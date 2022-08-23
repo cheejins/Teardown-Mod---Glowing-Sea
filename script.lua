@@ -14,6 +14,7 @@ config.showDebugMod = false
 config.showGrid = true
 config.flashTiles = false
 config.showGridBoundaries = true
+config.deleteOutsideBoundaries = false
 
 
 controls = {
@@ -59,17 +60,16 @@ function Tick()
 
         -- Grid
         UpdateTiles()
-        ManageDynamicTileGeneration()
         UpdateBoundaries()
         ManageInput()
 
         DebugMod()
+        ManageDynamicTileGeneration()
+
 
         -- if config.flashTiles then config.flashTiles() end
 
     end
-
-    ResetControls()
 
 end
 
@@ -94,10 +94,20 @@ function Draw()
     end
 
     if config.showGridBoundaries then
-        DrawBounds(Procgen.boundaries, 1,1,1, 1)
+
+        DrawBounds(GetBoundsMinMax(Procgen.boundaries, nil, TileSize), 1,1,1, 1)
         DrawBounds(GetBoundsOffset(Procgen.container, Player.gridTr.pos), 0,0,1, 1)
-        DrawBounds(GetBoundsOffset(Procgen.bounds, Player.gridTr.pos), 0,1,0, 1)
+
+        if controls.deleteTile then
+            DrawBounds(GetBoundsOffset(Procgen.bounds, Player.gridTr.pos), 1,0,0, 1)
+        else
+            DrawBounds(GetBoundsOffset(Procgen.bounds, Player.gridTr.pos), 0,1,0, 1)
+        end
+
     end
+
+
+    ResetControls() -- Must be called here since draw() is called last.
 
 end
 

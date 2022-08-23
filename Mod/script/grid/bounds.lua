@@ -15,28 +15,32 @@ end
 
 
 ---Find the min and max indexes by iterating and comparing them.
-function SetBoundsMinMax(bounds, offset, TileSize)
+function GetBoundsMinMax(b, offset, TileSize)
 
     offset = offset or Vec(0,0,0)
 
-    bounds.min[1] = math.huge
-    bounds.min[3] = math.huge
-    bounds.max[1] = -math.huge
-    bounds.max[3] = -math.huge
+    b.min[1] = math.huge
+    b.min[3] = math.huge
+    b.max[1] = -math.huge
+    b.max[3] = -math.huge
 
     -- Determine min and max x values.
     for k, v in pairs(TileLocX) do
-        bounds.min[1] = math.min(k, bounds.min[1] + offset[1])
-        bounds.max[1] = math.max(k, bounds.max[1] + offset[1])
+        if true then
+            b.min[1] = math.min(k, b.min[1] + offset[1])
+            b.max[1] = math.max(k, b.max[1] + offset[1])
+        end
     end
 
     -- Determine min and max z values.
     for k, v in pairs(TileLocZ) do
-        bounds.min[3] = math.min(k, bounds.min[3] + offset[3])
-        bounds.max[3] = math.max(k, bounds.max[3] + offset[3])
+        if true then
+            b.min[3] = math.min(k, b.min[3] + offset[3])
+            b.max[3] = math.max(k, b.max[3] + offset[3])
+        end
     end
 
-    return bounds
+    return b
 
 end
 
